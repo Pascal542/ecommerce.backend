@@ -17,6 +17,9 @@ spring.datasource.username={TU USUARIO}
 spring.datasource.password={TU CONTRASENA}
 
 MysqlServer viene por defecto con el usuario root, el cual puedes cambiar su contrasenia en la instalacion
+Se tiene que crear una DB con nombre ecommerce.
+
+CREATE DATABASE ecommerce;
 
 Luego de esto en IntelliJ Idea CE, en Project Structure se tiene que elegir el SDK de Java a usar, elegir el 17
 
