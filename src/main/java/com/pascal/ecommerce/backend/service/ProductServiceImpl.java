@@ -1,5 +1,6 @@
 package com.pascal.ecommerce.backend.service;
 
+import com.pascal.ecommerce.backend.enums.CategoryEnum;
 import com.pascal.ecommerce.backend.models.Product;
 import com.pascal.ecommerce.backend.repository.ProductDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> getProductsByPriceRangeInCatalog(Double minPrice, Double maxPrice) {
         return productDao.findByPriceBetween(minPrice, maxPrice);
+    }
+
+    @Override
+    public List<Product> getProductsByCategoryInCatalog(CategoryEnum category) {
+        return productDao.findByCategory(category);
     }
 
 

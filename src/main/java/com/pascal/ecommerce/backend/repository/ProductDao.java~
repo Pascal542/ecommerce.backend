@@ -1,6 +1,5 @@
 package com.pascal.ecommerce.backend.repository;
 
-import com.pascal.ecommerce.backend.enums.CategoryEnum;
 import com.pascal.ecommerce.backend.models.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,5 +11,7 @@ import java.util.List;
 public interface ProductDao extends JpaRepository<Product, Integer> {
     List<Product> findByProductNameContainingIgnoreCase(String productName);
     List<Product> findByPriceBetween(Double minPrice, Double maxPrice);
-    List<Product> findByCategory(CategoryEnum category);
+
+    // Query to search by category
+    @Query("SELECT p FROM Product p WHERE p.category = ?1")
 }

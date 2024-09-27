@@ -1,5 +1,6 @@
 package com.pascal.ecommerce.backend.controller;
 
+import com.pascal.ecommerce.backend.enums.CategoryEnum;
 import com.pascal.ecommerce.backend.models.Product;
 import com.pascal.ecommerce.backend.service.ProductService;
 import jakarta.validation.Valid;
@@ -60,5 +61,12 @@ public class ProductController {
     @GetMapping("/products/price")
     public List<Product> getProductsByPriceRange(@RequestParam Double minPrice, @RequestParam Double maxPrice) {
         return productService.getProductsByPriceRangeInCatalog(minPrice, maxPrice);
+    }
+
+    // OBTIENE PRODUCTOS POR CATEGORIA
+    @GetMapping("/products/category/{category}")
+    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable CategoryEnum category) {
+        List<Product> products = productService.getProductsByCategoryInCatalog(category);
+        return new ResponseEntity<List<Product>>(products, HttpStatus.OK);
     }
 }
