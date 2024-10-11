@@ -7,6 +7,7 @@ import com.pascal.ecommerce.backend.model.User;
 import com.pascal.ecommerce.backend.request.CreateUserRequest;
 import com.pascal.ecommerce.backend.request.UserUpdateRequest;
 import com.pascal.ecommerce.backend.response.ApiResponse;
+import com.pascal.ecommerce.backend.service.email.EmailService;
 import com.pascal.ecommerce.backend.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping("${api.prefix}/users")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
+    private final EmailService emailService;
     private final IUserService userService;
 
     @GetMapping("/{userId}/user")
@@ -38,6 +40,14 @@ public class UserController {
         try {
             User user = userService.createUser(request);
             UserDto userDto = userService.convertUserToDto(user);
+
+            // send registration email
+            emailService
+                    .sendEmail(userDto.getEmail(),
+                            "Registro de usuario",
+                            "Usted ha registrado una cuenta en nuestro ecommerce.");
+
+
             return ResponseEntity.ok(new ApiResponse("Create User Success!", userDto));
         } catch (AlreadyExistsException e) {
             return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
