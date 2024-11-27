@@ -30,9 +30,6 @@ public class Cart {
 
 
 
-
-
-
     public void addItem(CartItem item) {
         this.items.add(item);
         item.setCart(this);
