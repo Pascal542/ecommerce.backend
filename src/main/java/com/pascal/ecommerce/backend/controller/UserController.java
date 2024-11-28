@@ -53,6 +53,24 @@ public class UserController {
             return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
     }
+    @PostMapping("/add/admin")
+    public ResponseEntity<ApiResponse> createAdmin(@RequestBody CreateUserRequest request) {
+        try {
+            User user = userService.createAdmin(request);
+            UserDto userDto = userService.convertUserToDto(user);
+
+            // send registration email
+            emailService
+                    .sendEmail(userDto.getEmail(),
+                            "Registro de administrador",
+                            "Usted ha registrado una cuenta en nuestro ecommerce.");
+
+
+            return ResponseEntity.ok(new ApiResponse("Create Admin Success!", userDto));
+        } catch (AlreadyExistsException e) {
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
     @PutMapping("/{userId}/update")
     public ResponseEntity<ApiResponse> updateUser(@RequestBody UserUpdateRequest request, @PathVariable Long userId) {
         try {
