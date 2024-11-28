@@ -18,13 +18,15 @@ public class AuthService {
 
 
     private final UserRepository userRepository;
-
-    @Autowired
-    public AuthService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
     private JwtService jwtService;
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public AuthService(UserRepository userRepository, JwtService jwtService) {
+        this.userRepository = userRepository;
+        this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public AuthResponse login(LoginRequest request) {
         return null;
@@ -39,7 +41,6 @@ public class AuthService {
                         .password(request.getPassword())
                         .firstName(request.getFirstName())
                         .lastName(request.getLastName())
-                        .role(Role.USER)
                         .build();
 
                     userRepository.save(user);

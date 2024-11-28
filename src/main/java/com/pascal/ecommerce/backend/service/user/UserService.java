@@ -1,6 +1,7 @@
 package com.pascal.ecommerce.backend.service.user;
 
 import com.pascal.ecommerce.backend.dto.UserDto;
+import com.pascal.ecommerce.backend.enums.Role;
 import com.pascal.ecommerce.backend.exceptions.AlreadyExistsException;
 import com.pascal.ecommerce.backend.exceptions.ResourceNotFoundException;
 import com.pascal.ecommerce.backend.model.User;
