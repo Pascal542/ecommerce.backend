@@ -5,6 +5,7 @@ import com.pascal.ecommerce.backend.exceptions.AlreadyExistsException;
 import com.pascal.ecommerce.backend.exceptions.ResourceNotFoundException;
 import com.pascal.ecommerce.backend.model.User;
 import com.pascal.ecommerce.backend.request.CreateUserRequest;
+import com.pascal.ecommerce.backend.request.LoginRequest;
 import com.pascal.ecommerce.backend.request.UserUpdateRequest;
 import com.pascal.ecommerce.backend.response.ApiResponse;
 import com.pascal.ecommerce.backend.service.email.EmailService;
@@ -28,6 +29,17 @@ public class UserController {
     public ResponseEntity<ApiResponse> getUserById(@PathVariable Long userId) {
         try {
             User user = userService.getUserById(userId);
+            UserDto userDto = userService.convertUserToDto(user);
+            return ResponseEntity.ok(new ApiResponse("Success", userDto));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request) {
+        try {
+            User user = userService.login(request);
             UserDto userDto = userService.convertUserToDto(user);
             return ResponseEntity.ok(new ApiResponse("Success", userDto));
         } catch (ResourceNotFoundException e) {
