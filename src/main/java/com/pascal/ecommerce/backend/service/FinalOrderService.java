@@ -44,4 +44,8 @@ public class FinalOrderService {
     public List<FinalOrder> getAllFinalOrders() {
         return finalOrderRepository.findAll();
     }
+
+    public List<FinalOrder> getFinalOrdersByUserId(Long userId) {
+        return finalOrderRepository.findAllByUserId(userId);
+    }
 }
