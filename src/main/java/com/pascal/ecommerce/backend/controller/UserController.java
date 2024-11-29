@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -31,6 +33,17 @@ public class UserController {
             User user = userService.getUserById(userId);
             UserDto userDto = userService.convertUserToDto(user);
             return ResponseEntity.ok(new ApiResponse("Success", userDto));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<ApiResponse> getAllUsers() {
+        try {
+            List<User> users = userService.getAllUsers();
+            List<UserDto> convertedUsers = userService.convertUserToDtoList(users);
+            return ResponseEntity.ok(new ApiResponse("Success", users));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -83,6 +96,42 @@ public class UserController {
             return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
     }
+
+    @PostMapping("/add/provider")
+    public ResponseEntity<ApiResponse> createProvider(@RequestBody CreateUserRequest request) {
+        try {
+            User user = userService.createProvider(request);
+            UserDto userDto = userService.convertUserToDto(user);
+
+            // send registration email
+            emailService
+                    .sendEmail(userDto.getEmail(),
+                            "Registro de proveedor",
+                            "Usted ha registrado una cuenta en nuestro ecommerce.");
+
+
+            return ResponseEntity.ok(new ApiResponse("Create Provider Success!", userDto));
+        } catch (AlreadyExistsException e) {
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @PutMapping("/{userId}/update")
     public ResponseEntity<ApiResponse> updateUser(@RequestBody UserUpdateRequest request, @PathVariable Long userId) {
         try {
@@ -102,4 +151,5 @@ public class UserController {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
+
 }

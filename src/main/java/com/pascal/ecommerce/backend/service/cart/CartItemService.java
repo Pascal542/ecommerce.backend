@@ -1,88 +1,83 @@
 package com.pascal.ecommerce.backend.service.cart;
 
+import com.pascal.ecommerce.backend.dto.CartItemDto;
+import com.pascal.ecommerce.backend.dto.ProductCartItemDto;
 import com.pascal.ecommerce.backend.exceptions.ResourceNotFoundException;
-import com.pascal.ecommerce.backend.model.Cart;
 import com.pascal.ecommerce.backend.model.CartItem;
 import com.pascal.ecommerce.backend.model.Product;
 import com.pascal.ecommerce.backend.repository.CartItemRepository;
-import com.pascal.ecommerce.backend.repository.CartRepository;
 import com.pascal.ecommerce.backend.service.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CartItemService implements ICartItemService {
     private final CartItemRepository cartItemRepository;
-    private final CartRepository cartRepository;
     private final IProductService productService;
-    private final ICartService cartService;
 
 
     @Override
-    public void addItemToCart(Long cartId, Long productId, int quantity) {
-        //1. Get the cart
-        //2. Get the product
-        //3. Check if the product already in the cart
-        //4. If Yes, then increase the quantity with the requested quantity
-        //5. If No, then initiate a new CartItem entry.
-        Cart cart = cartService.getCart(cartId);
+    public void addCartItem(Long productId, int quantity, Long userId) {
+        // Get the product
         Product product = productService.getProductById(productId);
-        CartItem cartItem = cart.getItems()
-                .stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst().orElse(new CartItem());
-        if (cartItem.getId() == null) {
-            cartItem.setCart(cart);
-            cartItem.setProduct(product);
-            cartItem.setQuantity(quantity);
-            cartItem.setUnitPrice(product.getPrice());
-        }
-        else {
-            cartItem.setQuantity(cartItem.getQuantity() + quantity);
-        }
+
+        CartItem cartItem = new CartItem();
+
+        cartItem.setProduct(product);
+        cartItem.setQuantity(quantity);
+        cartItem.setUnitPrice(product.getPrice());
+        cartItem.setUserId(userId);
         cartItem.setTotalPrice();
-        cart.addItem(cartItem);
         cartItemRepository.save(cartItem);
-        cartRepository.save(cart);
     }
 
     @Override
-    public void removeItemFromCart(Long cartId, Long productId) {
-        Cart cart = cartService.getCart(cartId);
-        CartItem itemToRemove = getCartItem(cartId, productId);
-        cart.removeItem(itemToRemove);
-        cartRepository.save(cart);
+    @Transactional
+    public void removeCartItem(Long cartItemId, Long userId) {
+        CartItem cartItem = cartItemRepository.findByIdAndUserId(cartItemId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("CartItem not found for id: " + cartItemId + " and userId: " + userId));
+        cartItemRepository.delete(cartItem);
     }
 
     @Override
-    public void updateItemQuantity(Long cartId, Long productId, int quantity) {
-        Cart cart = cartService.getCart(cartId);
-        cart.getItems()
-                .stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst()
-                .ifPresent(item -> {
-                    item.setQuantity(quantity);
-                    item.setUnitPrice(item.getProduct().getPrice());
-                    item.setTotalPrice();
-                });
-        BigDecimal totalAmount = cart.getItems()
-                .stream().map(CartItem ::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        cart.setTotalAmount(totalAmount);
-        cartRepository.save(cart);
+    @Transactional
+    public CartItem updateCartItemQuantity(Long cartItemId, Long userId, int quantity) {
+        CartItem cartItem = cartItemRepository.findByIdAndUserId(cartItemId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("CartItem not found for id: " + cartItemId + " and userId: " + userId));
+        cartItem.setQuantity(quantity);
+        cartItem.setTotalPrice();
+        return cartItemRepository.save(cartItem); // Persistir los cambios
     }
 
     @Override
-    public CartItem getCartItem(Long cartId, Long productId) {
-        Cart cart = cartService.getCart(cartId);
-        return  cart.getItems()
-                .stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst().orElseThrow(() -> new ResourceNotFoundException("Item not found"));
+    public List<CartItem> getCartItemsByUserId(Long userId) {
+        return cartItemRepository.findAllByUserId(userId);
+    }
+
+    public CartItemDto mapToCartItemDTO(CartItem cartItem) {
+        ProductCartItemDto productDto = mapToProductCartItemDto(cartItem.getProduct());
+
+        CartItemDto cartItemDTO = new CartItemDto();
+        cartItemDTO.setItemId(cartItem.getId());
+        cartItemDTO.setProduct(productDto);
+        cartItemDTO.setQuantity(cartItem.getQuantity());
+        return cartItemDTO;
+    }
+
+
+    public ProductCartItemDto mapToProductCartItemDto(Product product) {
+        ProductCartItemDto dto = new ProductCartItemDto();
+        dto.setId(product.getId());
+        dto.setName(product.getName());
+        dto.setBrand(product.getBrand());
+        dto.setPrice(product.getPrice());
+        dto.setInventory(product.getInventory());
+        dto.setDescription(product.getDescription());
+        dto.setCategory(product.getCategory()); // Asegúrate de que la categoría sea serializable o usa un DTO para ella si es necesario.
+        return dto;
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,11 @@ public class UserService implements IUserService {
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
@@ -72,6 +78,35 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User createProvider(CreateUserRequest request) {
+        return  Optional.of(request)
+                .filter(user -> !userRepository.existsByEmail(request.getEmail()))
+                .map(req -> {
+                    Role userRole = roleRepository.findByName("PROVIDER")
+                            .orElseThrow(() -> new ResourceNotFoundException("Role ADMIN not found!"));
+
+                    User user = new User();
+                    user.setEmail(request.getEmail());
+                    user.setPassword(request.getPassword());
+                    user.setFirstName(request.getFirstName());
+                    user.setLastName(request.getLastName());
+                    user.setRole(List.of(userRole));
+                    return  userRepository.save(user);
+                }) .orElseThrow(() -> new AlreadyExistsException("Oops!" +request.getEmail() +" already exists!"));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    @Override
     public User updateUser(UserUpdateRequest request, Long userId) {
         return  userRepository.findById(userId).map(existingUser ->{
             existingUser.setFirstName(request.getFirstName());
@@ -91,7 +126,23 @@ public class UserService implements IUserService {
 
     @Override
     public UserDto convertUserToDto(User user) {
-        return modelMapper.map(user, UserDto.class);
+        UserDto userDto = modelMapper.map(user, UserDto.class); // Convierte el objeto base
+        List<String> roleNames = user.getRole().stream()       // Extrae los nombres de los roles
+                .map(Role::getName)
+                .toList();
+        userDto.setRoles(roleNames);                          // Asigna los roles al DTO
+        return userDto;
     }
+
+    @Override
+    public List<UserDto> convertUserToDtoList(List<User> users) {
+        return users.stream()
+                .map(this::convertUserToDto) // Convertir cada usuario a UserDto
+                .collect(Collectors.toList()); // Usar Collectors.toList() para recopilar los resultados
+    }
+
+
+
+
 
 }

@@ -2,10 +2,11 @@ package com.pascal.ecommerce.backend.service.cart;
 
 import com.pascal.ecommerce.backend.model.CartItem;
 
-public interface ICartItemService {
-    void addItemToCart(Long cartId, Long productId, int quantity);
-    void removeItemFromCart(Long cartId, Long productId);
-    void updateItemQuantity(Long cartId, Long productId, int quantity);
+import java.util.List;
 
-    CartItem getCartItem(Long cartId, Long productId);
+public interface ICartItemService {
+    void addCartItem(Long productId, int quantity, Long userId);
+    void removeCartItem(Long cartItemId, Long userId);
+    CartItem updateCartItemQuantity(Long cartItemId, Long userId, int quantity);
+    List<CartItem> getCartItemsByUserId(Long userId);
 }
