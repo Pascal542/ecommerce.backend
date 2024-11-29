@@ -1,10 +1,8 @@
 package com.pascal.ecommerce.backend.controller;
 
 import com.pascal.ecommerce.backend.dto.CartItemDto;
-import com.pascal.ecommerce.backend.dto.ProductCartItemDto;
 import com.pascal.ecommerce.backend.exceptions.ResourceNotFoundException;
 import com.pascal.ecommerce.backend.model.CartItem;
-import com.pascal.ecommerce.backend.model.Product;
 import com.pascal.ecommerce.backend.response.ApiResponse;
 import com.pascal.ecommerce.backend.service.cart.ICartItemService;
 import lombok.RequiredArgsConstructor;
@@ -70,27 +68,5 @@ public class CartItemController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
-    }
-
-    public CartItemDto mapToCartItemDTO(CartItem cartItem) {
-        ProductCartItemDto productDto = mapToProductCartItemDto(cartItem.getProduct());
-
-        CartItemDto cartItemDTO = new CartItemDto();
-        cartItemDTO.setItemId(cartItem.getId());
-        cartItemDTO.setProduct(productDto);
-        cartItemDTO.setQuantity(cartItem.getQuantity());
-        return cartItemDTO;
-    }
-
-    public ProductCartItemDto mapToProductCartItemDto(Product product) {
-        ProductCartItemDto dto = new ProductCartItemDto();
-        dto.setId(product.getId());
-        dto.setName(product.getName());
-        dto.setBrand(product.getBrand());
-        dto.setPrice(product.getPrice());
-        dto.setInventory(product.getInventory());
-        dto.setDescription(product.getDescription());
-        dto.setCategory(product.getCategory()); // Asegúrate de que la categoría sea serializable o usa un DTO para ella si es necesario.
-        return dto;
     }
 }

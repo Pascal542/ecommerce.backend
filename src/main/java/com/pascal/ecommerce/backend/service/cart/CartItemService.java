@@ -57,27 +57,4 @@ public class CartItemService implements ICartItemService {
     public List<CartItem> getCartItemsByUserId(Long userId) {
         return cartItemRepository.findAllByUserId(userId);
     }
-
-    public CartItemDto mapToCartItemDTO(CartItem cartItem) {
-        ProductCartItemDto productDto = mapToProductCartItemDto(cartItem.getProduct());
-
-        CartItemDto cartItemDTO = new CartItemDto();
-        cartItemDTO.setItemId(cartItem.getId());
-        cartItemDTO.setProduct(productDto);
-        cartItemDTO.setQuantity(cartItem.getQuantity());
-        return cartItemDTO;
-    }
-
-
-    public ProductCartItemDto mapToProductCartItemDto(Product product) {
-        ProductCartItemDto dto = new ProductCartItemDto();
-        dto.setId(product.getId());
-        dto.setName(product.getName());
-        dto.setBrand(product.getBrand());
-        dto.setPrice(product.getPrice());
-        dto.setInventory(product.getInventory());
-        dto.setDescription(product.getDescription());
-        dto.setCategory(product.getCategory()); // Asegúrate de que la categoría sea serializable o usa un DTO para ella si es necesario.
-        return dto;
-    }
 }
