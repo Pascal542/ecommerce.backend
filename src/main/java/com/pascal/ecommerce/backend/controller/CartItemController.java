@@ -1,12 +1,16 @@
 package com.pascal.ecommerce.backend.controller;
 
 import com.pascal.ecommerce.backend.exceptions.ResourceNotFoundException;
+import com.pascal.ecommerce.backend.model.Cart;
+import com.pascal.ecommerce.backend.repository.CartRepository;
 import com.pascal.ecommerce.backend.response.ApiResponse;
 import com.pascal.ecommerce.backend.service.cart.ICartItemService;
 import com.pascal.ecommerce.backend.service.cart.ICartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -17,15 +21,17 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class CartItemController {
     private final ICartItemService cartItemService;
     private final ICartService cartService;
+    private final CartRepository cartRepository;
 
 
     @PostMapping("/item/add")
     public ResponseEntity<ApiResponse> addItemToCart(@RequestParam(required = false) Long cartId,
                                                      @RequestParam Long productId,
-                                                     @RequestParam Integer quantity) {
+                                                     @RequestParam Integer quantity,
+                                                     @RequestParam Long userId) {
         try {
             if (cartId == null) {
-                cartId= cartService.initializeNewCart();
+                cartId = cartService.initializeNewCart(userId);
             }
             cartItemService.addItemToCart(cartId, productId, quantity);
             return ResponseEntity.ok(new ApiResponse("Add Item Success", null));

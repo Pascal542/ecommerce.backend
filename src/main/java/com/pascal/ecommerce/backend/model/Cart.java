@@ -28,6 +28,9 @@ public class Cart {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "true_user_id")
+    private Long userId;
+
 
 
     public void addItem(CartItem item) {
