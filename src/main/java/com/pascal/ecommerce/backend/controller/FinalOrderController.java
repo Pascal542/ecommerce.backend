@@ -40,4 +40,15 @@ public class FinalOrderController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Resource Not Found",e.getMessage()));
         }
     }
+
+    @GetMapping("/get-by-user/{userId}")
+    public ResponseEntity<ApiResponse> getFinalOrderById(@PathVariable Long userId) {
+        try {
+            List<FinalOrder> finalOrders = finalOrderService.getFinalOrdersByUserId(userId);
+            return ResponseEntity.ok(new ApiResponse(
+                    "Final Orders Fetched Successfully!", finalOrders));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Resource Not Found",e.getMessage()));
+        }
+    }
 }
