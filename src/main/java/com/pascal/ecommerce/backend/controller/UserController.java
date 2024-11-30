@@ -49,8 +49,8 @@ public class UserController {
         }
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request) {
+    @GetMapping("/userdata")
+    public ResponseEntity<ApiResponse> userdata(@RequestBody LoginRequest request) {
         try {
             User user = userService.login(request);
             UserDto userDto = userService.convertUserToDto(user);
@@ -59,6 +59,17 @@ public class UserController {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
+    @PostMapping("/login")
+public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request) {
+    try {
+        User user = userService.login(request);
+        UserDto userDto = userService.convertUserToDto(user);
+        return ResponseEntity.ok(new ApiResponse("Success", userDto));
+    } catch (ResourceNotFoundException e) {
+        return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
+    }
+}
+
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> createUser(@RequestBody CreateUserRequest request) {
