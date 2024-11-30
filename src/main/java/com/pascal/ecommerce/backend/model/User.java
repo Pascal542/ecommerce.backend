@@ -31,5 +31,7 @@ public class User {
     )
     private List<Role> role = new ArrayList<>();
 
+    private boolean enabled;
+
 
 }

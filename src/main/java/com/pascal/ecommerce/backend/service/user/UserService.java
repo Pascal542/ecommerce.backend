@@ -55,6 +55,7 @@ public class UserService implements IUserService {
                     user.setPassword(request.getPassword());
                     user.setFirstName(request.getFirstName());
                     user.setLastName(request.getLastName());
+                    user.setEnabled(true);
                     user.setRole(List.of(userRole));
                     return  userRepository.save(user);
                 }) .orElseThrow(() -> new AlreadyExistsException("Oops!" +request.getEmail() +" already exists!"));
@@ -72,6 +73,7 @@ public class UserService implements IUserService {
                     user.setPassword(request.getPassword());
                     user.setFirstName(request.getFirstName());
                     user.setLastName(request.getLastName());
+                    user.setEnabled(true);
                     user.setRole(List.of(userRole));
                     return  userRepository.save(user);
                 }) .orElseThrow(() -> new AlreadyExistsException("Oops!" +request.getEmail() +" already exists!"));
@@ -90,6 +92,7 @@ public class UserService implements IUserService {
                     user.setPassword(request.getPassword());
                     user.setFirstName(request.getFirstName());
                     user.setLastName(request.getLastName());
+                    user.setEnabled(true);
                     user.setRole(List.of(userRole));
                     return  userRepository.save(user);
                 }) .orElseThrow(() -> new AlreadyExistsException("Oops!" +request.getEmail() +" already exists!"));
